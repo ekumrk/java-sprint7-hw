@@ -81,8 +81,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
         if (node != null) {
-            node.next = node.next.next;
-            node.prev = node.prev.prev;
+            node.prev.next = node.next;
+            node.next.prev = node.prev;
             viewsHistory.remove(node.item.getId());
         }
     }

@@ -166,4 +166,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
         return subtasks.get(id);
     }
+
+    public Path getHistoryFile() {
+        return historyFile;
+    }
 }
