@@ -10,6 +10,10 @@ import tasks.Subtask;
 import tasks.Task;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +21,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 abstract class TaskManagerTest<T extends TaskManager> {
 
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
+    public static final ZoneId zone = ZoneId.of("Europe/Simferopol");
     HistoryManager historyManager = Managers.getDefaultHistory();
 
 
@@ -30,11 +36,15 @@ abstract class TaskManagerTest<T extends TaskManager> {
 
 
     void init() {
-        task = new Task("taskTitle", "taskContent");
-        task2 = new Task("task2Title", "task2Content");
+        task = new Task("taskTitle", "taskContent",
+                ZonedDateTime.of(LocalDateTime.parse("12:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
+        task2 = new Task("task2Title", "task2Content",
+                ZonedDateTime.of(LocalDateTime.parse("13:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
         epic = new Epic("epicTitle", "epicContent");
-        subtask = new Subtask("subtaskTitle", "subtaskContent", epic.getId());
-        subtask2 = new Subtask("subtask2Title", "subtask2Content", epic.getId());
+        subtask = new Subtask("subtaskTitle", "subtaskContent", epic.getId(),
+                ZonedDateTime.of(LocalDateTime.parse("14:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
+        subtask2 = new Subtask("subtask2Title", "subtask2Content", epic.getId(),
+                ZonedDateTime.of(LocalDateTime.parse("15:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
     }
 
     @Test

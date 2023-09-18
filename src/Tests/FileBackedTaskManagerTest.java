@@ -4,10 +4,12 @@ import manager.FileBackedTaskManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tasks.Task;
 
 import java.nio.file.Files;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -138,5 +140,48 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         if (Files.exists(manager.getHistoryFile())) {
             super.getTaskListIfTasksAreNotCreated();
         }
+    }
+
+    @Test
+    void saveAndReadFromFileIfAllTaskAreNotCreated() throws IOException {
+        manager.allTasks.clear();
+        manager.save();
+        String fileContent = Files.readString(manager.getHistoryFile());
+        String[] fileContents = fileContent.split("\n");
+        assertTrue(fileContents.length == 1); //только заголовок с id, type итд
+
+        manager.readListFromFile();
+        assertTrue(manager.allTasks.isEmpty());
+    }
+
+    @Test
+    void saveAndReadFromFileIfEpicWithoutSubtasks() throws IOException {
+        manager.createNewEpic(epic);
+        String fileContent = Files.readString(manager.getHistoryFile());
+        String[] fileContents = fileContent.split("\n");
+        String result = fileContents[1];
+        assertEquals(epic.toString(), result);
+
+        manager.allTasks.clear();
+        manager.epics.clear();
+
+        manager.readListFromFile();
+        assertFalse(manager.epics.isEmpty());
+    }
+
+    @Test
+    void saveAndReadFromFileIfHistoryIsEmpty() throws IOException {
+        manager.createNewTask(task);
+        manager.save();
+
+        List<Task> result = manager.getHistory();
+        assertTrue(result.isEmpty());
+
+        manager.allTasks.clear();
+        manager.tasks.clear();
+
+        manager.readListFromFile();
+        List<Task> result2 = manager.getHistory();
+        assertTrue(result2.isEmpty());
     }
 }

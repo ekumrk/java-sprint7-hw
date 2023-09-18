@@ -1,17 +1,29 @@
 package tasks;
 
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Task {
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
     protected int id;
     protected String title;
     protected String content;
     protected Status status = Status.NEW;
 
-    public Task (String title, String content) {
+    protected int duration;
+    public ZonedDateTime startTime;
+
+    public Task (String title, String content, ZonedDateTime startTime, int duration) {
         this.title = title;
         this.content = content;
+        this.startTime = startTime;
+        this.duration = duration;
     }
+
+    protected Task() {
+    }
+
 
     public int getId() {
         return id;
@@ -31,9 +43,22 @@ public class Task {
         this.status = status;
     }
 
+    public ZonedDateTime getEndTime() {
+        return startTime.plusMinutes(duration);
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public ZonedDateTime getStartTime() {
+        return startTime;
+    }
+
     @Override
     public String toString() {
-        return String.format("%s,%s,%s,%s,%s", id, TaskTypes.TASK, title, status, content);
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s", id, TaskTypes.TASK, title, status, content,
+                startTime.format(DATE_TIME_FORMATTER), duration, getEndTime().format(DATE_TIME_FORMATTER));
     }
 
     @Override

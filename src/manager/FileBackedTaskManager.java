@@ -8,16 +8,20 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
+    public static final ZoneId zone = ZoneId.of("Europe/Simferopol");
     private static final String HOME = System.getProperty("user.home");
     private final Path historyFile;
 
-    private final List<Task> allTasks = new ArrayList<>();
+    public List<Task> allTasks = new ArrayList<>();
 
 
     public FileBackedTaskManager(String direction) throws IOException {
@@ -27,7 +31,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    private void save() throws IOException {
+    public void save() throws IOException {
         try {
         if (Files.notExists(historyFile)) {
             Files.createFile(historyFile);
@@ -77,12 +81,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                    List<String> lineContent = List.of(lines[i].split(","));
 
                    if (lineContent.get(1).equals(TaskTypes.TASK.toString())) {
-                       createNewTask(new Task(lineContent.get(2), lineContent.get(4)));
+                       createNewTask(new Task(lineContent.get(2), lineContent.get(4),
+                               ZonedDateTime.of(LocalDateTime.parse(lineContent.get(5), DATE_TIME_FORMATTER), zone),
+                               Integer.parseInt(lineContent.get(6))));
                    } else if (lineContent.get(1).equals(TaskTypes.EPIC.toString())) {
                        createNewEpic(new Epic(lineContent.get(2), lineContent.get(4)));
                    } else if (lineContent.get(1).equals(TaskTypes.SUBTASK.toString())) {
-                       int epicId = Integer.parseInt(lineContent.get(5));
-                       createNewSubtask(new Subtask(lineContent.get(2), lineContent.get(4), epicId));
+                       int epicId = Integer.parseInt(lineContent.get(8));
+                       createNewSubtask(new Subtask(lineContent.get(2), lineContent.get(4), epicId,
+                               ZonedDateTime.of(LocalDateTime.parse(lineContent.get(5), DATE_TIME_FORMATTER), zone),
+                               Integer.parseInt(lineContent.get(6))));
                    } else {
                        for (String o: lineContent) {
                            int id = Integer.parseInt(o);
@@ -105,7 +113,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public void writeToFile(List<String> tasks, List<Integer> history) throws IOException {
         try (FileWriter writer = new FileWriter(String.valueOf(historyFile), StandardCharsets.UTF_8)) {
-            writer.write("id,type,name,status,description,epicID\n");
+            writer.write("id,type,name,status,description,startTime,duration,endTime,epicID\n");
             for (String element : tasks) {
                 writer.write(element + "\n");
             }
@@ -169,5 +177,42 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public Path getHistoryFile() {
         return historyFile;
+    }
+
+    public TreeSet<Task> getPrioritizedTasks() {
+        Set<Task> taskListWithoutEpics = allTasks.stream()
+                .filter(task -> task.getClass() != Epic.class)
+                .collect(Collectors.toSet());
+
+        TreeSet<Task> result = new TreeSet<>((task1, task2) -> {
+            if (task1.startTime == null) {
+                return -1;
+            }
+            if (task1.startTime.isAfter(task2.startTime)) {
+                return 1;
+            }
+            if (task1.startTime.isBefore(task2.startTime)) {
+                return -1;
+            }
+            if (task1.startTime.equals(task2.startTime)) {
+                return 0;
+            }
+            return 0;
+        });
+
+        result.addAll(taskListWithoutEpics);
+        return result;
+    }
+
+    public boolean ifCrosses() {
+        Set<Task> crossTest = getPrioritizedTasks();
+        List<Task> test = List.copyOf(crossTest);
+        for(int i = 1; i < test.size(); i++) {
+            boolean check = test.get(i).startTime.isBefore(test.get(i-1).getEndTime());
+            if (check) {
+                return true;
+            }
+        }
+        return false;
     }
 }

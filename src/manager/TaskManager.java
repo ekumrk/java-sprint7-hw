@@ -13,6 +13,7 @@ import java.util.Map;
 
 public interface TaskManager {
 
+
     Map<Integer, Task> tasks = new HashMap<>();
     Map<Integer, Subtask> subtasks = new HashMap<>();
     Map<Integer, Epic> epics = new HashMap<>();

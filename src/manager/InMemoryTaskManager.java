@@ -2,8 +2,10 @@ package manager;
 import tasks.*;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -37,8 +39,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getTaskList() {
-        List<Task> taskArrayList = new ArrayList<>(tasks.values());
-        return taskArrayList;
+        return new ArrayList<>(tasks.values());
     }
 
     @Override
@@ -72,8 +73,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<Epic> getEpicList() {
-        ArrayList<Epic> epicArrayList = new ArrayList<>(epics.values());
-        return epicArrayList;
+        return new ArrayList<>(epics.values());
     }
 
     @Override
@@ -124,6 +124,28 @@ public class InMemoryTaskManager implements TaskManager {
             return null;
         }
         epic.getSubtasksId().add(subtask.getId());
+
+        Comparator<ZonedDateTime> comparator = Comparator.comparing(
+                zdt -> zdt.truncatedTo(ChronoUnit.MINUTES));
+        TreeMap<ZonedDateTime, ZonedDateTime> subtasksStartAndEndTime = new TreeMap<>(comparator);
+        List<Subtask> subtasksOfEpic = new ArrayList<>();
+
+        for (Integer n : epic.getSubtasksId()) {
+            subtasksOfEpic.add(subtasks.get(n));
+        }
+
+        for (Subtask subt : subtasksOfEpic) {
+            subtasksStartAndEndTime.put(subt.getStartTime(), subt.getEndTime());
+        }
+
+        epic.setStartTime(subtasksStartAndEndTime.firstKey());
+        ZonedDateTime lastKey = subtasksStartAndEndTime.lastKey();
+        epic.setEndTime(subtasksStartAndEndTime.get(lastKey));
+
+        Duration duration = Duration.between(epic.getStartTime(), epic.getEndTime());
+        epic.setDuration((int) duration.toMinutes());
+
+
         updateEpicStatus(epic);
         return (subtask.getId());
     }
@@ -131,8 +153,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<Subtask> getSubtaskList() {
-        ArrayList<Subtask> subtaskArrayList = new ArrayList<>(subtasks.values());
-        return subtaskArrayList;
+        return new ArrayList<>(subtasks.values());
     }
 
     @Override

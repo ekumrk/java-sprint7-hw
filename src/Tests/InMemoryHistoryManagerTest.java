@@ -7,27 +7,39 @@ import org.junit.jupiter.api.Test;
 import tasks.Task;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InMemoryHistoryManagerTest {
-   private TaskManager manager;
-   Task task;
-   Task task2;
-   Task task3;
-   Task task4;
-   Task task5;
+
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm dd.MM.yyyy");
+    public static final ZoneId zone = ZoneId.of("Europe/Simferopol");
+    private TaskManager manager;
+    Task task;
+    Task task2;
+    Task task3;
+    Task task4;
+    Task task5;
 
     @BeforeEach
-    void init() throws IOException {
+    void init() {
         manager = Managers.getDefault();
-        task = new Task("taskTitle", "taskContent");
-        task2 = new Task("task2Title", "task2Content");
-        task3 = new Task("task3Title", "task3Content");
-        task4 = new Task("task4Title", "task4Content");
-        task5 = new Task("task5Title", "task5Content");
+        task = new Task("taskTitle", "taskContent",
+                ZonedDateTime.of(LocalDateTime.parse("12:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
+        task2 = new Task("task2Title", "task2Content",
+                ZonedDateTime.of(LocalDateTime.parse("13:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
+        task3 = new Task("task3Title", "task3Content",
+                ZonedDateTime.of(LocalDateTime.parse("14:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
+        task4 = new Task("task4Title", "task4Content",
+                ZonedDateTime.of(LocalDateTime.parse("15:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
+        task5 = new Task("task5Title", "task5Content",
+                ZonedDateTime.of(LocalDateTime.parse("16:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
     }
 
     @Test
