@@ -1,4 +1,5 @@
 package manager;
+import ProgrammExceptions.CrossTimeException;
 import tasks.*;
 
 import java.io.IOException;
@@ -40,6 +41,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createNewTask(Task task) throws IOException {
+        try {
+            ifCrosses(task);
+        } catch (CrossTimeException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
         prioritySet.add(task);
         task.setId(nextId);
         nextId++;
@@ -140,6 +147,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createNewSubtask(Subtask subtask) throws IOException {
+        try {
+            ifCrosses(subtask);
+        } catch (CrossTimeException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
         prioritySet.add(subtask);
         subtask.setId(nextId);
         nextId++;
@@ -271,6 +284,10 @@ public class InMemoryTaskManager implements TaskManager {
                 throw new CrossTimeException("Введённая задача пересекается с другими, нельзя её добавить.");
             }
         }
+    }
+
+    public void clearPriotitySet() {
+        prioritySet.clear();
     }
 }
 

@@ -13,7 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager>{
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     @BeforeEach
     void init() {
@@ -38,8 +38,10 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
     @Test
     void correctReadFromFile() throws IOException {
-        manager.createNewTask(task2);
+        manager.createNewTask(task);
         manager.tasks.clear();
+        manager.allTasks.clear();
+        manager.clearPriotitySet();
         manager.readListFromFile();
         assertFalse(manager.tasks.isEmpty());
     }

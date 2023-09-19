@@ -39,12 +39,12 @@ abstract class TaskManagerTest<T extends TaskManager> {
         task = new Task("taskTitle", "taskContent",
                 ZonedDateTime.of(LocalDateTime.parse("12:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
         task2 = new Task("task2Title", "task2Content",
-                ZonedDateTime.of(LocalDateTime.parse("13:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
+                ZonedDateTime.of(LocalDateTime.parse("13:15 02.01.2023", DATE_TIME_FORMATTER), zone), 30);
         epic = new Epic("epicTitle", "epicContent");
         subtask = new Subtask("subtaskTitle", "subtaskContent", epic.getId(),
-                ZonedDateTime.of(LocalDateTime.parse("14:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
+                ZonedDateTime.of(LocalDateTime.parse("14:15 03.01.2023", DATE_TIME_FORMATTER), zone), 30);
         subtask2 = new Subtask("subtask2Title", "subtask2Content", epic.getId(),
-                ZonedDateTime.of(LocalDateTime.parse("15:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
+                ZonedDateTime.of(LocalDateTime.parse("15:15 04.01.2023", DATE_TIME_FORMATTER), zone), 30);
     }
 
     @Test
