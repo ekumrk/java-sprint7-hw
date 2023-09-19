@@ -48,27 +48,36 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public int createNewTask(Task task) throws IOException {
+    public void createNewTask(Task task) throws IOException {
+        try {
+            ifCrosses(task);
+        } catch (CrossTimeException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
         super.createNewTask(task);
         allTasks.add(task);
         save();
-        return task.getId();
     }
 
     @Override
-    public int createNewEpic(Epic epic) throws IOException {
+    public void createNewEpic(Epic epic) throws IOException {
         super.createNewEpic(epic);
         allTasks.add(epic);
         save();
-        return epic.getId();
     }
 
     @Override
-    public Integer createNewSubtask(Subtask subtask) throws IOException {
+    public void createNewSubtask(Subtask subtask) throws IOException {
+        try {
+            ifCrosses(subtask);
+        } catch (CrossTimeException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
         super.createNewSubtask(subtask);
         allTasks.add(subtask);
         save();
-        return subtask.getId();
     }
 
     public void readListFromFile() {
@@ -179,40 +188,4 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return historyFile;
     }
 
-    public TreeSet<Task> getPrioritizedTasks() {
-        Set<Task> taskListWithoutEpics = allTasks.stream()
-                .filter(task -> task.getClass() != Epic.class)
-                .collect(Collectors.toSet());
-
-        TreeSet<Task> result = new TreeSet<>((task1, task2) -> {
-            if (task1.startTime == null) {
-                return -1;
-            }
-            if (task1.startTime.isAfter(task2.startTime)) {
-                return 1;
-            }
-            if (task1.startTime.isBefore(task2.startTime)) {
-                return -1;
-            }
-            if (task1.startTime.equals(task2.startTime)) {
-                return 0;
-            }
-            return 0;
-        });
-
-        result.addAll(taskListWithoutEpics);
-        return result;
-    }
-
-    public boolean ifCrosses() {
-        Set<Task> crossTest = getPrioritizedTasks();
-        List<Task> test = List.copyOf(crossTest);
-        for(int i = 1; i < test.size(); i++) {
-            boolean check = test.get(i).startTime.isBefore(test.get(i-1).getEndTime());
-            if (check) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

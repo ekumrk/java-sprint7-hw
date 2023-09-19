@@ -26,7 +26,7 @@ public class Main {
                 ZonedDateTime.of(LocalDateTime.parse("12:15 01.01.2023", DATE_TIME_FORMATTER), zone), 30);
         f.createNewTask(task);
         task = new Task("Посмотреть фильм", "Звёздные воины",
-                ZonedDateTime.of(LocalDateTime.parse("16:15 02.01.2023", DATE_TIME_FORMATTER), zone), 120);
+                ZonedDateTime.of(LocalDateTime.parse("11:15 02.01.2023", DATE_TIME_FORMATTER), zone), 120);
         f.createNewTask(task);
 
         epic = new Epic("Сходить в магазин", "Сделать покупки");
@@ -48,8 +48,6 @@ public class Main {
         f.getTaskFromId(1);
         f.getTaskFromId(2);
         System.out.println(f.getHistory());
-
-        System.out.println(f.getPrioritizedTasks());
-        System.out.println(f.ifCrosses());
+        System.out.println(f.getPrioritySet());
     }
 }

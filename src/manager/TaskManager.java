@@ -18,7 +18,7 @@ public interface TaskManager {
     Map<Integer, Subtask> subtasks = new HashMap<>();
     Map<Integer, Epic> epics = new HashMap<>();
 
-    public int createNewTask(Task task) throws IOException;
+    public void createNewTask(Task task) throws IOException;
 
     public void updateTask(int id, Status status);
 
@@ -30,7 +30,7 @@ public interface TaskManager {
 
     public void deleteTaskFromId(int id);
 
-    public int createNewEpic(Epic epic) throws IOException;
+    public void createNewEpic(Epic epic) throws IOException;
 
     public ArrayList<Epic> getEpicList();
 
@@ -42,7 +42,7 @@ public interface TaskManager {
 
     public void deleteEpicFromId(int id);
 
-    public Integer createNewSubtask(Subtask subtask) throws IOException;
+    public void createNewSubtask(Subtask subtask) throws IOException;
 
 
     public ArrayList<Subtask> getSubtaskList();
